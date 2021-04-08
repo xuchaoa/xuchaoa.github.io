@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Archerx&#39;s blog</title>
+    
+    
+    
+    <link>/</link>
+    <description>Recent content on Archerx&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 22 Mar 2021 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>insert、update、delete注入</title>
+      <link>/posts/xss/</link>
+      <pubDate>Mon, 22 Mar 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/xss/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          利用SQL注入获取数据库数据，利用的方法可以大致分为联合查询、报错、布尔盲注以及延时注入，通常这些方法都是基于select查询语句中的SQL注射点来实现的。那么，当我们发现了一个基于insert、update、delete语句的注射点时（比如有的网站会记录用户浏览记录，包括referer、client_ip、user-agent等，还有类似于用户注册、密码修改、信息删除等功能），还可以用如上方法获取我们需要的数据吗？在这里，我们以MYSQL的显错为例，看一下如何在insert、update、delete的注入点中获取我们想要的数据。
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Fri, 25 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Hi there My name is Radek and I&amp;rsquo;m the author of this theme. I made it to help you present your ideas easier.
+We all know how hard is to start something on the web, especially these days. You need to prepare a bunch of stuff, configure them and when that’s done — create the content.
+This theme is pretty basic and covers all of the essentials. All you have to do is start typing!
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Showcase</title>
+      <link>/showcase/</link>
+      <pubDate>Fri, 18 Jan 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/showcase/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          Header 2 Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam nec interdum metus. Aenean rutrum ligula sodales ex auctor, sed tempus dui mollis. Curabitur ipsum dui, aliquet nec commodo at, tristique eget ante. Donec quis dolor nec nunc mollis interdum vel in purus. Sed vitae leo scelerisque, sollicitudin elit sed, congue ante. In augue nisl, vestibulum commodo est a, tristique porttitor est. Proin laoreet iaculis ornare. Nullam ut neque quam.
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello1/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello1/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello2/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello2/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello3/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello3/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello4/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello4/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello5/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello5/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Hello Friend</title>
+      <link>/posts/hello6/</link>
+      <pubDate>Wed, 17 Sep 1986 00:00:00 +0000</pubDate>
+      
+      <guid>/posts/hello6/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          &#34;Hello, friend?&#34; That&#39;s lame. Maybe I should give you a name?
+          
+        
+        </description>
+    </item>
+    
+    <item>
+      <title>Archive</title>
+      <link>/archive/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/archive/</guid>
+      <description>
+        
+          
+          
+          
+        
+        
+        
+          
+          
+        
+        </description>
+    </item>
+    
+  </channel>
+</rss>
